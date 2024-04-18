@@ -3,7 +3,6 @@ import torch
 from glob import glob
 import numpy as np
 from tqdm import tqdm
-import random
 
 #print("当前工作目录:", os.getcwd())
 # 如果需要，改变工作目录
@@ -17,9 +16,9 @@ class CapacityDataset:
     ind_ood_car_dict_path='../five_fold_utils/ind_odd_dict2.npz.npy'
     ind_ood_car_dict_path='../five_fold_utils/ind_odd_dict3.npz.npy'
     '''
-    def __init__(self, all_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/all_car_dict.npz.npy',
-                 ind_ood_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/ind_odd_dict2.npz.npy',
-                 train=True, fold_num=2, train_size_ratio = 1.0, file_ratio = 1.0):
+    def __init__(self, all_car_dict_path='finetuning/preprocess/five_fold_utils/all_car_dict.npz.npy',
+                 ind_ood_car_dict_path='finetuning/preprocess/five_fold_utils/ind_odd_dict2.npz.npy',
+                 train=True, fold_num=2, train_size_ratio = 0.8, file_ratio = 1.0):
         self.all_car_dict = np.load(all_car_dict_path, allow_pickle=True).item()
         ind_ood_car_dict = np.load(ind_ood_car_dict_path, allow_pickle=True).item()
         self.ind_car_num_list = ind_ood_car_dict['ind_sorted']
@@ -35,10 +34,10 @@ class CapacityDataset:
             # Combine ind and ood car numbers except the fold reserved for testing
             car_number = self.ind_car_num_list[:ind_train_start] + self.ind_car_num_list[ind_train_end:] + \
                          self.ood_car_num_list[:ood_train_start] + self.ood_car_num_list[ood_train_end:]
-            # 如果不需要验证train_size对模型的影响，将下两行注释即可
+            # 如果需要验证train_size对模型的影响，将下两行加入代码中即可
             # 1. 根据train_size_ratio随机选取训练集
-            random_car = random.range(len(car_number)), int((len(car_number) * train_size_ratio) / 0.8)
-            car_number = [car_number[i] for i in random_car]
+            #random_car = random.sample(range(len(car_number)), int((len(car_number) * train_size_ratio)) / 0.8)
+            #car_number = [car_number[i] for i in random_car]
             # 2. 根据train_size从后往前取
             #actual_train_size = int((len(car_number) * (1-train_size_ratio)) / 0.8)
 
@@ -53,7 +52,7 @@ class CapacityDataset:
         capacity_valid_car_number = []
 
         print("Loading data")
-        base_path = '/log/weiyian/'
+        base_path = 'finetuning/data'
         for each_num in tqdm(car_number):
             for each_pkl in self.all_car_dict[each_num]:
                 absolute_path = os.path.join(base_path, each_pkl)

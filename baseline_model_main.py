@@ -5,19 +5,18 @@ import sys
 import torch
 import pandas as pd
 from preprocess.capacity_dataset import CapacityDataset
-from preprocess.pre_utils import Normalizer, LabelNormalizer, PredictResult, EDNormalizer, EDPredictResult
+from preprocess.pre_utils import Normalizer, EDNormalizer, PreprocessNormalizer
 from torch.utils.data import DataLoader
 from torch.utils.data import Sampler
 #from utils import to_var, collate, Normalizer, PreprocessNormalizer
-from finetuning.model.arch.baseline_model import LSTMNet, MLP
+from model.arch.baseline_model import LSTMNet, MLP
 #from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn as nn
 from tqdm import tqdm
 import numpy as np
 import pickle
-#import xgboost as xgb
-from preprocess.dataset import PreprocessNormalizer, SlidingWindowBattery
+import xgboost as xgb
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.ensemble import GradientBoostingRegressor
@@ -40,39 +39,39 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='LSTMNet')
     parser.add_argument('--num_epochs', type=int, default=100)
     parser.add_argument('--norm', default='minmaxscaler')
-    parser.add_argument('--dataset', type=int, default=1) #运行脚本以在三个数据集上跑
+    parser.add_argument('--dataset', type=int, default=1)
 
 
     args = parser.parse_args()
-    #根据每个模型在每个数据集上的最佳折，
-    # fold_num_map = {
-    #     ('LSTM', '1'): 0,
-    #     ('LSTM', '2'): 2,
-    #     ('LSTM', '3'): 4,
-    #     ('XGBoost', '1'): 0,
-    #     ('XGBoost', '2'): 2,
-    #     ('XGBoost', '3'): 4,
-    #     ('MLP', '1'): 0,
-    #     ('MLP', '2'): 2,
-    #     ('MLP', '3'): 4,
-    #     ('RandomForest', '1'): 0,
-    #     ('RandomForest', '2'): 2,
-    #     ('RandomForest', '3'): 4,
 
-    # }
-    # fold_num = fold_num_map.get((args.model, args.dataset), 0)
+    fold_num_map = {
+        ('LSTM', '1'): 0,
+        ('LSTM', '2'): 2,
+        ('LSTM', '3'): 4,
+        ('XGBoost', '1'): 0,
+        ('XGBoost', '2'): 2,
+        ('XGBoost', '2'): 4,
+        ('MLP', '1'): 0,
+        ('MLP', '2'): 2,
+        ('MLP', '3'): 4,
+        ('RandomForest', '1'): 0,
+        ('RandomForest', '2'): 2,
+        ('RandomForest', '3'): 4,
+            # 以此类推，根据需要添加所有组合
+    }
+    fold_num = fold_num_map.get((args.model, args.dataset), 0)
     print("args", args)
     data_train = CapacityDataset(
-        all_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/all_car_dict.npz.npy',
-        ind_ood_car_dict_path=f'/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/ind_odd_dict{args.dataset}.npz.npy',
+        all_car_dict_path='finetuning/preprocess/five_fold_utils/all_car_dict.npz.npy',
+        ind_ood_car_dict_path=f'finetuning/preprocess/five_fold_utils/ind_odd_dict{args.dataset}.npz.npy',
         train=True,
-        fold_num = 0 #fold_num
+        #fold_num = 0 or self.args.fold_num(or fold_num)
     )
     data_test = CapacityDataset(
-        all_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/all_car_dict.npz.npy',
-        ind_ood_car_dict_path=f'/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/ind_odd_dict{args.dataset}.npz.npy',
+        all_car_dict_path='finetuning/preprocess/five_fold_utils/all_car_dict.npz.npy',
+        ind_ood_car_dict_path=f'finetuning/preprocess/five_fold_utils/ind_odd_dict{args.dataset}.npz.npy',
         train=False,
-        fold_num = 0 #fold_num
+        #fold_num = 0 or self.args.fold_num(or fold_num)
     )
 
     label_normalizer = EDNormalizer().exp_minmaxscaler(min_num=0,max_num=100)
@@ -155,7 +154,7 @@ if __name__ == '__main__':
         # 只保存最佳模型的预测结果
         result1_df = pd.DataFrame(result_list, columns=['file', 'mileage', 'predicted_capacity', 'actual_capacity'])
         result1_df['dataset'] = args.dataset
-        file_path = '/home/weiyian/finetuning/result/model_predict_result_lstm_411.csv'
+        file_path = 'finetuning/result/lstm_predict_result.csv'
         if not os.path.exists(file_path):
             result1_df.to_csv(file_path, mode="a", index=False)
             print('Statistics have been successfully written to the file with creating a new one.')
@@ -174,7 +173,7 @@ if __name__ == '__main__':
             'mape': best_metrics[3]
             }
         results_df = pd.DataFrame([results])
-        file_path = '/home/weiyian/finetuning/modelresult/model_result_all2.csv'
+        file_path = 'finetuning/result/rmse_result_all.csv'
         if not os.path.exists(file_path):
             results_df.to_csv(file_path, mode="a", index=False)
         else:
@@ -215,7 +214,7 @@ if __name__ == '__main__':
             'predicted_capacity': test_preds,
             'actual_capacity': test_labels
         })
-        file_path = '/home/weiyian/finetuning/result/model_predict_result_x.csv'
+        file_path = 'finetuning/result/xgb_predict_result.csv'
         if not os.path.exists(file_path):
             result1_df.to_csv(file_path, mode="a", index=False)
         else:
@@ -242,7 +241,7 @@ if __name__ == '__main__':
             'mape': best_metrics[3]
             }
         results_df = pd.DataFrame([results])
-        file_path = '/home/weiyian/finetuning/modelresult/model_result_all2.csv'
+        file_path = 'finetuning/result/rmse_result_all.csv'
         if not os.path.exists(file_path):
             results_df.to_csv(file_path, mode="a", index=False)
         else:
@@ -273,7 +272,7 @@ if __name__ == '__main__':
             'predicted_capacity': test_preds,
             'actual_capacity': test_labels
         })
-        file_path = '/home/weiyian/finetuning/result/model_predict_result_R.csv'
+        file_path = 'finetuning/result/RF_predict_result.csv'
         if not os.path.exists(file_path):
             result1_df.to_csv(file_path, mode="a", index=False)
         else:
@@ -290,14 +289,14 @@ if __name__ == '__main__':
             'mape': test_mape
             }
         results_df = pd.DataFrame([results])
-        file_path = '/home/weiyian/finetuning/modelresult/model_result_all2.csv'
+        file_path = '/finetuning/result/rmse_result_all.csv'
         if not os.path.exists(file_path):
             results_df.to_csv(file_path, mode="a", index=False)
         else:
             results_df.to_csv(file_path, mode="a", index=False, header=False)
         print(f"RandomForest - Train mse: {train_mse}, rmse: {train_rmse}, mae: {train_mae}, mape: {train_mape}")
         print(f"RandomForest - Test mse: {test_mse}, rmse: {test_rmse}, mae: {test_mae}, mape: {test_mape}")
-
+        
     elif args.model == "MLP":
         model = MLP(input_dim=128*8, hidden_dim=32, output_dim=1).cuda()
         optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -367,7 +366,7 @@ if __name__ == '__main__':
         # 只保存最佳模型的预测结果
         result1_df = pd.DataFrame(result_list, columns=['file', 'mileage', 'predicted_capacity', 'actual_capacity'])
         result1_df['dataset'] = args.dataset
-        file_path = '/home/weiyian/finetuning/result/model_predict_result_MLP411.csv'
+        file_path = 'finetuning/result/MLP_predict_result.csv'
         if not os.path.exists(file_path):
             result1_df.to_csv(file_path, mode="a", index=False)
             print('Statistics have been successfully written to the file with creating a new one.')
@@ -386,7 +385,7 @@ if __name__ == '__main__':
             'mape': best_metrics[3]
             }
         results_df = pd.DataFrame([results])
-        file_path = '/home/weiyian/finetuning/modelresult/model_result_all2.csv'
+        file_path = 'finetuning/result/rmse_result_all.csv'
         if not os.path.exists(file_path):
             results_df.to_csv(file_path, mode="a", index=False)
         else:

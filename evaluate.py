@@ -21,9 +21,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 sys.path.insert(0, os.getcwd())
 # sys.path.insert(0, os.path.dirname(os.getcwd()))
 from model.arch import gcn
-from preprocess.dataset import SlidingWindowBattery, PreprocessNormalizer
-from preprocess.capacity_dataset2 import CapacityDataset
-from preprocess.pre_utils import Normalizer, LabelNormalizer, PredictResult, EDNormalizer, EDPredictResult
+from newfine.preprocess.capacity_dataset import CapacityDataset
+from preprocess.pre_utils import Normalizer, PreprocessNormalizer, EDNormalizer
 from torch.utils.data import DataLoader
 from torch.utils.data import Sampler
 import random
@@ -55,8 +54,8 @@ class Evaluate:
 
         model_torch = os.path.join(self.args.current_model_path, "model.torch")
         data_eval = CapacityDataset(
-            all_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/all_car_dict.npz.npy',
-            ind_ood_car_dict_path='/log/weiyian/finetuning/preprocess/five_fold_utils/five_fold_utils/ind_odd_dict3.npz.npy',
+            all_car_dict_path='finetuning/preprocess/five_fold_utils/all_car_dict.npz.npy',
+            ind_ood_car_dict_path='finetuning/preprocess/five_fold_utils/ind_odd_dict2.npz.npy',
             train=False,
             #train_size_ratio=self.args.train_size_ratio, 
             #file_ratio = self.args.file_ratio,
@@ -65,9 +64,12 @@ class Evaluate:
         params = dict(
             device=self.args.device,
             embed_dim=self.args.embed_dim,
+            class_num=self.args.class_num,
+            kernel_num=self.args.kernel_num,
             kernel_sizes=self.args.kernel_sizes,
             drop_out=self.args.drop_out,
             last_kernel_num=self.args.last_kernel_num,
+            task_type=self.args.task_type
         )
 
 
@@ -121,10 +123,10 @@ class Evaluate:
             "soh": result_list[3]
         })
         # 定义保存路径
-        save_path = '/home/weiyian/finetuning/result'
+        save_path = 'finetuning/result'
 
-        # 保存文件
-        result_df.to_csv(f"{save_path}/{self.mode}_data3_beforetuning_result.csv", index=False)
+        # 保存文件，假设self.mode是你代码中的一个变量，你可以根据需要更改保存的文件名
+        result_df.to_csv(f"{save_path}/{self.mode}_data1_gcnn_result_fold0.csv", index=False) 
 
 
 
@@ -148,9 +150,7 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--model_params', type=str,
-                        default="/log/weiyian/log/gate_cnn/data1/2024-03-31-00-51-02/model/model_params.json")
-
-
+                        default="result/gate_cnn/data1/2024-03-31-14-48-11/model/model_params.json")
     
     args = parser.parse_args()
     with open(args.model_params, 'r') as file:

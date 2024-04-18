@@ -39,8 +39,6 @@ class Normalizer:
        
 
     def compute_min_max(self, res):
-
-
         column_max_all = np.max(res, axis=1)
         column_min_all = np.min(res, axis=1)
         column_std_all = np.std(res, axis=1)
@@ -63,6 +61,15 @@ class Normalizer:
         return eval(norm_name.capitalize() + 'Normalizer.norm')(self, df)
 
 
+class MinmaxscalerNormalizer(Normalizer):
+
+    def norm(self, df):
+        """
+        :param df: dataframe m * n
+        :return: df的归一化函数的结果
+        """
+        # return (df - self.mean) / np.maximum(np.maximum(1e-4, self.std), 0.1 * (self.max_norm - self.min_norm))
+        return (df - self.min_norm) / (self.max_norm - self.min_norm)
 
 class EDNormalizer():
     """
@@ -99,3 +106,32 @@ class EDNormalizer():
         label_normalizer.fit(temp_label)
 
         return label_normalizer
+
+class PreprocessNormalizer:
+    """
+    数据归一化类
+    """
+
+    def __init__(self, dataset, norm_name=None, normalizer_fn=None):
+        """
+        初始化
+        :param dataset: SlidingWindowBattery
+        :param norm_name: 用哪种归一化 如 ev 表示 EvNormalizer
+        :param normalizer_fn: 归一化函数
+        """
+        self.dataset = dataset
+        self.norm_name = norm_name
+        self.normalizer_fn = normalizer_fn
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        df, label = self.dataset[idx][0], self.dataset[idx][1]
+        if self.normalizer_fn is not None:
+            df = self.normalizer_fn(df, self.norm_name)
+        return df, label
+
+    def get_column(self):
+        df = self.dataset[1][0]
+        return list(df.columns)

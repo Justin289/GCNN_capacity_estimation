@@ -4,7 +4,9 @@ Use `pip install -r requirements.txt` to install all packages that are used in o
 
 # Dataset preparation
 ## Download
-Download from [OneDrive](https://1drv.ms/f/s!AnE8BfHe3IOlg13v2ltV0eP1-AgP?e=9o4zgL) and unzip them. More details are shown in our [paper](https://arxiv.org/abs/2201.12358). 
+Download from [OneDrive](https://1drv.ms/f/s!AnE8BfHe3IOlg13v2ltV0eP1-AgP?e=9o4zgL) and unzip them. Data are from this [paper](https://arxiv.org/abs/2201.12358). 
+
+You should save the data under `finetuning/data` folder. If the folder does not exist, then you need to create one
 
 Please make sure the data structure is like the following. 
 
@@ -73,23 +75,25 @@ Various indicators during operation are also recorded in the csv of the `file_pa
 
 
 ### train
-### For file `model_configs.json`:
-Please check the `model_configs.json` files carefully for hyperparameter settings. 
+### For file `model_config.json`:
+Please check the `model_config.json` files carefully for hyperparameter settings. 
 You can change `save_model_path` and `data_name` to the dataset you are using.
 Use `train_size_ratio` to do the split of trainning dataset, and use `file_ratio` to do the split of time length. 
+
 GCNN:
-Set `optuna` to `true` to find optimal parameters, and set `trans_train` to `false` /
+Set `optuna` to `true` to find optimal parameters, and set `trans_train` to `false` 
+
 FT-GCNN:
-Change `model_path` to the best saved model of GCNN on dataset1, and set `trans_train` to `true` to finetuning
+Change `model_path` to the best saved model of GCNN on dataset1, and set `trans_train` to `true` for finetuning
 
 To start training, run
 ```
 cd finetuning
 
-python ft-gcn_main.py --config_path model_configs.json --fold_num 0
+python ft-gcn_main.py
 ```
-If you want to fully run the five-fold experiments, you should remove the `#` from `line 73` to `line 76` in `ft-gcn_main.py`, and add a `#` at `line 71`
-If you want to fully run the train size and time length split experiments, you should remove the `"""` at `line 78` and `line 87` in `ft-gcn_main.py`, and add a `#` from `line 71` to `line 76`
+If you want to fully run the five-fold experiments, you should remove the `#` from `line 70` to `line 73` in `ft-gcn_main.py`, and add a `#` at `line 68`
+If you want to fully run the train size and time length split experiments, you should remove the `"""` at `line 75` and `line 84` in `ft-gcn_main.py`, and add a `#` from `line 68` to `line 73`
 After training, the reconstruction errors of data are recorded  in `save_model_path` configured by the
 `json` file, Various indicators during operation are also recorded in the csv of the target path.
 
@@ -99,24 +103,25 @@ After training, the reconstruction errors of data are recorded  in `save_model_p
 To run experiments on other brands, 
 you should manually generate the `npz` files by `five_fold_train_test_split.py`
 and change the variable
-`ind_ood_car_dict` in `othermodel_main.py` similarly as above. 
+`ind_ood_car_dict` in `baseline_model_main.py` similarly as above. 
 You may change the parameter of LSTM, MLP, XGB and RF by your self
 
 ### train
 To start training, run
 ```
 cd finetuning
-python othermodel_main.py --fold_num 0
+python baseline_model_main.py 
 ```
 If you want to fully run the five-fold experiments, you should run five times with different 
-`--fold_num`. Or you can write a `.sh` file to loop through five folds.
+`--fold_num`, or you can write a `.sh` file to loop through five folds.
+
 You can change `--dataset` to the dataset you want to train, or write a `.sh` file to loop through all datasets.
 
 ## Calculated RMSE and MAPE score
 For all the mentioned algorithms, we calculated the RMSE and MAPE values in their train file. You can check the score either in terminal or in the saving csv files.
 
 ## Evaluate and save predict result
-You can save preidct result of all models in `evaluate.py` for FT-GCNN and `othermodel_main.py` for other models. Preduct result is saving to `file_path`, you can change to your path.
+You can save preidct result of all models in `evaluate.py` for GCNN, FT-GCNN and `baseline_model_main.py` for other models. Preduct result is saving to `file_path`, you can change to your path.
 
 **Necessary modification:** Since the save path may be time dependent and machine dependent, one needs
 to change the path information in each py files.

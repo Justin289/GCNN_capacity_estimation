@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time : 2022/03/17 10:12
+# @Author : huangshaobo
+# @Email : huangshaobo@thinkenergy.net.cn
+# @Project : esb
+# @File : gcn.py
+
 import sys
 import torch
 import torch.nn as nn
@@ -9,6 +16,7 @@ class CNN_Gate_Aspect_Text(nn.Module):
         super(CNN_Gate_Aspect_Text, self).__init__()
 
         self.embed_dim= embed_dim  # 就是最后一维size D
+
 
         self.kernel_sizes = kernel_sizes
         self.last_kernel_num = last_kernel_num
@@ -25,7 +33,7 @@ class CNN_Gate_Aspect_Text(nn.Module):
 
         self.dropout = nn.Dropout(self.drop_out_num)
         self.fc_aspect = nn.Linear(self.embed_dim, self.last_kernel_num)
-        self.fc_cla = nn.Linear(len(self.kernel_sizes)*self.last_kernel_num, 1)
+        self.fc_cla = nn.Linear(len(self.kernel_sizes)*self.last_kernel_num, 7)
         self.fc_reg = nn.Linear(len(self.kernel_sizes)*self.last_kernel_num, 1)
 
     def forward(self, feature):
@@ -55,7 +63,8 @@ class CNN_Gate_Aspect_Text(nn.Module):
         #print(f"x0 shape final: {x0.shape}")
         #logger.info(x0.shape)
         # logger.info(x0.shape)
+
         logit = self.fc_reg(x0)  # (N,C)
 
+
         return logit    
-             

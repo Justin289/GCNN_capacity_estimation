@@ -1,0 +1,26 @@
+{
+    "trans_train": false,
+    "model_path": "finetuning/result/gate-cnn/2024-03-31-10-55-45/model/model.torch", 
+    "norm": "minmaxscaler",
+    "epochs": 40,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "cosine_factor": 0.01,
+    "embed_dim": 8,
+  
+    "save_model_path":"result/",
+    "last_kernel_num":4,
+    "kernel_sizes": [3,5,7,9,11,13],
+    "drop_out": 0.4,
+  
+
+    "data_name": "data1",
+    "study_name": "data1_gcn",
+    "optuna": true,
+    "n_trials": 40,
+    "device": "cuda",
+
+    "train_size_ratio": 0.8,
+    "file_ratio": 1
+  }
+  

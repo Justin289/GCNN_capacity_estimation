@@ -9,11 +9,11 @@ import pandas as pd
 import random
 from tqdm import tqdm
 
-data_dir = "/home/weiyian"
+data_dir = "finetuning/data"
 
 #基于battery_dataset生成all_car_dict
 #battert_dataset1
-data_path = data_dir+'/battery/battery_dataset1/data'
+data_path = data_dir+'battery_dataset1/data'
 data_pkl_files = glob(data_path+'/*.pkl')
 
 ind_pkl_files = []
@@ -52,11 +52,11 @@ random.shuffle(ood_sorted)
 print(ood_sorted)        
 ind_odd_dict = {}
 ind_odd_dict["ind_sorted"],ind_odd_dict["ood_sorted"] = ind_sorted, ood_sorted
-os.makedirs('/log/weiyian/finetuning/preprocess/five_fold_utils', exist_ok=True)
-np.save('/log/weiyian/finetuning/preprocess/five_fold_utils/ind_odd_dict1.npz', ind_odd_dict)
+os.makedirs('finetuning/preprocess/five_fold_utils', exist_ok=True)
+np.save('finetuning/preprocess/five_fold_utils/ind_odd_dict1.npz', ind_odd_dict)
 
 #battery_dataset2
-data_path = data_dir+'/battery/battery_dataset2/data'
+data_path = data_dir+'/battery_dataset2/data'
 
 data_pkl_files = glob(data_path+'/*.pkl')
 ind_pkl_files = []
@@ -96,8 +96,8 @@ random.shuffle(ood_sorted)
 print(ood_sorted)        
 ind_odd_dict = {}
 ind_odd_dict["ind_sorted"],ind_odd_dict["ood_sorted"] = ind_sorted, ood_sorted
-os.makedirs('/log/weiyian/finetuning/preprocess/five_fold_utils', exist_ok=True)
-np.save('/log/weiyian/finetuning/preprocess/five_fold_utils/ind_odd_dict2.npz', ind_odd_dict)
+os.makedirs('finetuning/preprocess/five_fold_utils', exist_ok=True)
+np.save('finetuning/preprocess/five_fold_utils/ind_odd_dict2.npz', ind_odd_dict)
 
 #battery_dataset3
 data_path = data_dir+'/battery/battery_dataset3/data'
@@ -142,8 +142,8 @@ random.shuffle(ood_sorted)
 print(ood_sorted)
 ind_odd_dict = {}
 ind_odd_dict["ind_sorted"],ind_odd_dict["ood_sorted"] = ind_sorted, ood_sorted
-os.makedirs('/log/weiyian/finetuning/preprocess/five_fold_utils', exist_ok=True)
-np.save('/log/weiyian/finetuning/preprocess/five_fold_utils/ind_odd_dict3.npz', ind_odd_dict)
+os.makedirs('finetuning/preprocess/five_fold_utils', exist_ok=True)
+np.save('finetuning/preprocess/five_fold_utils/ind_odd_dict3.npz', ind_odd_dict)
 
 #all cars random shuffle
 # shuffle
@@ -158,9 +158,9 @@ print(ood_sorted)
 # print(ood_car_num_list, len(ood_car_num_list))
 
 # save all the three brands path information
-np.save('/log/weiyian/finetuning/preprocess/five_fold_utils/all_car_dict.npz', all_car_dict)
+np.save('finetuning/preprocess/five_fold_utils/all_car_dict.npz', all_car_dict)
 
 ind_odd_dict = {}
 ind_odd_dict["ind_sorted"],ind_odd_dict["ood_sorted"] = ind_sorted, ood_sorted
-os.makedirs('/log/weiyian/finetuning/preprocess/five_fold_utils', exist_ok=True)
-np.save('/log/weiyian/finetuning/preprocess/five_fold_utils/ind_odd_dict.npz', ind_odd_dict)
+os.makedirs('finetuning/preprocess/five_fold_utils', exist_ok=True)
+np.save('finetuning/preprocess/five_fold_utils/ind_odd_dict.npz', ind_odd_dict)
