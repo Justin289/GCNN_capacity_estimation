@@ -4,7 +4,7 @@ Use `pip install -r requirements.txt` to install all packages that are used in o
 
 # Dataset preparation
 ## Download
-Download from [OneDrive](https://1drv.ms/f/s!AnE8BfHe3IOlg13v2ltV0eP1-AgP?e=9o4zgL) and unzip them. Data are from this [paper](https://arxiv.org/abs/2201.12358). 
+Download from [OneDrive](https://1drv.ms/f/s!AnE8BfHe3IOlg13v2ltV0eP1-AgP?e=9o4zgL) and unzip them. 
 
 You should save the data under `finetuning/data` folder. If the folder does not exist, then you need to create one
 
