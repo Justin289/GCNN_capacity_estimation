@@ -4,8 +4,7 @@ Use `pip install -r requirements.txt` to install all packages that are used in o
 
 # Dataset preparation
 ## Download
-Download from [OneDrive](https://1drv.ms/f/s!AnE8BfHe3IOlg13v2ltV0eP1-AgP?e=9o4zgL) and unzip them. 
-
+Download from [EV field datasets Tsinghua](https://data.mendeley.com/drafts/mcsh4hnb8b) and unzip them.
 You should save the data under `finetuning/data` folder. If the folder does not exist, then you need to create one
 
 Please make sure the data structure is like the following. 
